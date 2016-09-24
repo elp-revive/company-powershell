@@ -96,7 +96,7 @@
 
 (defun company-powershell--build-sentinel (p s)
   (message "%s: %s" (process-name p) (replace-regexp-in-string "\n" "" s))
-  (when (eq s 'finished)
+  (when (eq 0 (process-exit-status p))
     (setq company-powershell--enabled t)
     (company-powershell--keywords)))
 
@@ -120,6 +120,7 @@
 
 (defun company-powershell--prefix ()
   (and (eq major-mode 'powershell-mode)
+       company-powershell--enabled
        (not (company-in-string-or-comment))
        (company-grab-symbol)))
 
