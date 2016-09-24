@@ -57,6 +57,9 @@
 (defvar company-powershell-data-file "commands.dat"
   "File to store with command info.")
 
+(defvar company-powershell-build-script "commands.ps1"
+  "Script to build command index.")
+
 (defvar company-powershell-dir)
 (setq company-powershell-dir
       (when load-file-name (file-name-directory load-file-name)))
@@ -64,45 +67,45 @@
 ;; ------------------------------------------------------------
 
 (defvar company-powershell--enabled t)
-(defun company-powershell--load (file)
+(defun company-powershell--load ()
   "Load / build command index."
-  (when company-powershell--enabled
-    (when (not (file-exists-p company-powershell-data-file))
-      (let ((do-it (y-or-n-p "Generate command index?")))
-        (if do-it
-            (company-powershell--build-index file)
-          (setq company-powershell--enabled nil)
-          (user-error "Disabling `company-powershell'."))))
-    (and company-powershell--enabled
-         (file-exists-p company-powershell-data-file)
-         (with-temp-buffer
-           (insert-file-contents file)
-           (car (read-from-string
-                 (buffer-substring-no-properties (point-min) (point-max))))))))
+  (let ((data (expand-file-name company-powershell-data-file
+                                company-powershell-dir))
+        (script (expand-file-name company-powershell-build-script
+                                  company-powershell-dir)))
+    (when company-powershell--enabled
+      (when (not (file-exists-p data))
+        (setq company-powershell--enabled nil)
+        (let ((do-it (y-or-n-p "Generate command index?")))
+          (if do-it
+              (company-powershell--build-index data script)
+            (user-error "Disabling `company-powershell'."))))
+      (and company-powershell--enabled
+           (file-exists-p data)
+           (with-temp-buffer
+             (insert-file-contents data)
+             (car (read-from-string
+                   (buffer-substring-no-properties (point-min) (point-max)))))))))
 
-(defun company-powershell--build-index (file)
+(defun company-powershell--build-index (file script)
   "Generate command index for completion."
   (let ((proc (start-process "company-powershell" "*company-powershell build*"
-                             "powershell" "-f"
-                             (expand-file-name "commands.ps1" company-powershell-dir)
-                             company-powershell-data-file)))
+                             "powershell" "-f" script file)))
     (message "Generating command index, disabling completion until finished.")
-    (setq company-powershell--enabled nil)
     (set-process-sentinel proc #'company-powershell--build-sentinel)))
 
 (defun company-powershell--build-sentinel (p s)
   (message "%s: %s" (process-name p) (replace-regexp-in-string "\n" "" s))
-  (setq company-powershell--enabled t)
-  (company-powershell--keywords))
+  (when (eq s 'finished)
+    (setq company-powershell--enabled t)
+    (company-powershell--keywords)))
 
 (defvar company-powershell--keywords nil)
 (defun company-powershell--keywords ()
   (when company-powershell--enabled
     (or company-powershell--keywords
         (setq company-powershell--keywords
-              (let ((data (company-powershell--load
-                           (expand-file-name company-powershell-data-file
-                                             company-powershell-dir))))
+              (let ((data (company-powershell--load)))
                 (sort
                  (cl-loop for (cmd type uri syn) in data
                     do
