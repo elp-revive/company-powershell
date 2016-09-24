@@ -91,7 +91,7 @@
     (set-process-sentinel proc #'company-powershell--build-sentinel)))
 
 (defun company-powershell--build-sentinel (p s)
-  (message "company-posh build: %s" p (replace-regexp-in-string "\n" "" s))
+  (message "%s: %s" (process-name p) (replace-regexp-in-string "\n" "" s))
   (setq company-powershell--enabled t)
   (company-powershell--keywords))
 
