@@ -137,6 +137,9 @@
                   (string-trim syn))))
     (company-doc-buffer syn)))
 
+(defun company-powershell--meta (candidate)
+  (get-text-property 0 'synopsis candidate))
+
 (defun company-powershell--online (candidate)
   "Lookup help for candidate online."
   (let ((uri (get-text-property 0 'help candidate)))
@@ -154,6 +157,7 @@
     (annotation (company-powershell--annotation arg))
     (candidates (company-powershell--candidates arg))
     (doc-buffer (company-powershell--doc arg))
+    (meta (company-powershell--meta arg))
     (location (company-powershell--online arg))
     (require-match 'never)
     (sorted t)
