@@ -132,10 +132,18 @@
   (or (get-text-property 0 'annot candidate) ""))
 
 (defun company-powershell--doc (candidate)
-  (let* ((syn (get-text-property 0 'synopsis candidate))
-         (syn (or (and (string= "" syn) "No documentation")
-                  (string-trim syn))))
-    (company-doc-buffer syn)))
+  (company-doc-buffer
+   (replace-regexp-in-string
+    "\n\n+" "\n\n"
+    (shell-command-to-string
+     (format "powershell -c \"Get-Help %s | %%{$_.Description}\""
+             candidate)))))
+
+;; (defun company-powershell--doc (candidate)
+;;   (let* ((syn (get-text-property 0 'synopsis candidate))
+;;          (syn (or (and (string= "" syn) "No documentation")
+;;                   (string-trim syn))))
+;;     (company-doc-buffer syn)))
 
 (defun company-powershell--meta (candidate)
   (get-text-property 0 'synopsis candidate))

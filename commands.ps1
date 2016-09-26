@@ -24,9 +24,9 @@ if (($force -eq $null) -and (Test-Path $outfile)) {
     Write-Error "$outfile already exists" -ErrorAction "Stop"
 }
 
-"(" | Out-file $outfile -Encoding utf8 -Force
+"(" | Out-File $outfile -Encoding utf8 -Force
 
-get-command | 
+Get-Command | 
   %{("(""$($_.Name)"" ""$($_.CommandType)"" ""$($_.HelpUri)"" " +
      """$(get-help $_ | %{$_.Synopsis})"")").
     Replace("`r`n", " ").Replace('\', '\\')} |
