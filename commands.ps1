@@ -1,8 +1,18 @@
+<# 
+.SYNOPSIS
+  Generate a list of commands and metadata for company completion.
+.DESCRIPTION
+  Outputs data as a simple alist of form:
+    (("command" "commandType" "helpUri" "synopsis")
+     ...)
+.PARAMETER outfile
+  Path to output file, default is $PSScriptroot\commands.dat
+.PARAMETER force
+  If non-nil overwrites outfile.
+#>
+
 param($outfile = $null,
      $force = $null)
-
-# generate list of commands:
-# (("command" "commandType" "helpUri" "synopsis") ... )
 
 if ($outfile -eq $null) {
     $outfile = [System.IO.Path]::GetFullPath("$PSScriptroot\commands.dat")
