@@ -54,6 +54,12 @@
   :type 'boolean
   :group 'company-powershell)
 
+(defcustom company-powershell-modes
+  '(powershell-mode inf-powershell-mode)
+  "Modes to enable `company-powershell'."
+  :group 'company-powershell
+  :type 'sexp)
+
 (defvar company-powershell-data-file "commands.dat"
   "File to store with command info.")
 
@@ -119,7 +125,7 @@
                  'string<))))))
 
 (defun company-powershell--prefix ()
-  (and (eq major-mode 'powershell-mode)
+  (and (memq major-mode company-powershell-modes)
        company-powershell--enabled
        (not (company-in-string-or-comment))
        (company-grab-symbol)))
