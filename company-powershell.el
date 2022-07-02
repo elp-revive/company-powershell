@@ -3,7 +3,7 @@
 ;; Author: Noah Peart <noah.v.peart@gmail.com>
 ;; Maintainer: Jen-Chieh Shen <jcs090218@gmail.com>
 ;; URL: https://github.com/elp-revive/company-powershell
-;; Package-Requires: ((emacs "26.1") (company-mode "0.9"))
+;; Package-Requires: ((emacs "26.1") (company "0.8.12"))
 
 ;; Copyright (C) 2016, Noah Peart, all rights reserved.
 ;; Created: 23 September 2016
