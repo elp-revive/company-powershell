@@ -1,8 +1,10 @@
 ;;; company-powershell --- Emacs autocompletion backend for powershell
 
 ;; Author: Noah Peart <noah.v.peart@gmail.com>
-;; URL: https://github.com/nverno/company-powershell
-;; Package-Requires: ((emacs "24.3") (cl-lib "0.5") (company-mode "0.9")) 
+;; Maintainer: Jen-Chieh Shen <jcs090218@gmail.com>
+;; URL: https://github.com/elp-revive/company-powershell
+;; Package-Requires: ((emacs "26.1") (company-mode "0.9"))
+
 ;; Copyright (C) 2016, Noah Peart, all rights reserved.
 ;; Created: 23 September 2016
 
@@ -24,8 +26,6 @@
 ;; Floor, Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
-
-;;; Description:
 
 ;;  Company autocompletion backend for powershell.  It will ask to create an
 ;;  index of commands when first invoked.  This takes a while, so `company-powershell'
@@ -72,26 +72,21 @@
 
 ;; ------------------------------------------------------------
 
-(defvar company-powershell--enabled t)
 (defun company-powershell--load ()
   "Load / build command index."
   (let ((data (expand-file-name company-powershell-data-file
                                 company-powershell-dir))
         (script (expand-file-name company-powershell-build-script
                                   company-powershell-dir)))
-    (when company-powershell--enabled
-      (when (not (file-exists-p data))
-        (setq company-powershell--enabled nil)
-        (let ((do-it (y-or-n-p "Generate command index?")))
-          (if do-it
-              (company-powershell--build-index data script)
-            (user-error "Disabling `company-powershell'."))))
-      (and company-powershell--enabled
-           (file-exists-p data)
-           (with-temp-buffer
-             (insert-file-contents data)
-             (car (read-from-string
-                   (buffer-substring-no-properties (point-min) (point-max)))))))))
+    (unless (file-exists-p data)
+      (if-let ((do-it (y-or-n-p "Generate command index?")))
+          (company-powershell--build-index data script)
+        (user-error "Disabling `company-powershell'.")))
+    (and (file-exists-p data)
+         (with-temp-buffer
+           (insert-file-contents data)
+           (car (read-from-string
+                 (buffer-substring-no-properties (point-min) (point-max))))))))
 
 (defun company-powershell--build-index (file script)
   "Generate command index for completion."
@@ -103,30 +98,29 @@
 (defun company-powershell--build-sentinel (p s)
   (message "%s: %s" (process-name p) (replace-regexp-in-string "\n" "" s))
   (when (eq 0 (process-exit-status p))
-    (setq company-powershell--enabled t)
     (company-powershell--keywords)))
 
 (defvar company-powershell--keywords nil)
+
 (defun company-powershell--keywords ()
-  (when company-powershell--enabled
-    (or company-powershell--keywords
-        (setq company-powershell--keywords
-              (let ((data (company-powershell--load)))
-                (sort
-                 (cl-loop for (cmd type uri syn) in data
-                    do
-                      (add-text-properties 0 1
-                                           (list
-                                            'annot type
-                                            'synopsis syn
-                                            'help uri)
-                                           cmd)
-                    collect cmd)
-                 'string<))))))
+  (or company-powershell--keywords
+      (setq company-powershell--keywords
+            (let ((data (company-powershell--load)))
+              (sort
+               (cl-loop for (cmd type uri syn) in data
+                        do
+                        (add-text-properties 0 1
+                                             (list
+                                              'annot type
+                                              'synopsis syn
+                                              'help uri)
+                                             cmd)
+                        collect cmd)
+               'string<)))))
 
 (defun company-powershell--prefix ()
   (and (memq major-mode company-powershell-modes)
-       company-powershell--enabled
+       company-powershell--keywords
        (not (company-in-string-or-comment))
        (company-grab-symbol)))
 
