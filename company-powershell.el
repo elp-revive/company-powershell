@@ -3,7 +3,7 @@
 ;; Author: Noah Peart <noah.v.peart@gmail.com>
 ;; Maintainer: Jen-Chieh Shen <jcs090218@gmail.com>
 ;; URL: https://github.com/elp-revive/company-powershell
-;; Package-Requires: ((emacs "26.1") (company "0.8.12"))
+;; Package-Requires: ((emacs "26.1") (company "0.8.12") (ht "2.4"))
 
 ;; Copyright (C) 2016, Noah Peart, all rights reserved.
 ;; Created: 23 September 2016
@@ -40,10 +40,13 @@
 ;; ![example](ex/example.png)
 
 ;;; Code:
+
 (eval-when-compile
   (require 'cl-lib))
 (require 'subr-x)
+
 (require 'company)
+(require 'ht)
 
 (defgroup company-powershell nil
   "company backend for powershell"
@@ -66,7 +69,11 @@
 (defvar company-powershell-build-script "commands.ps1"
   "Script to build command index.")
 
+(defvar company-powershell--cache-doc-buffer (ht-create)
+  "Store doc-buffer cache.")
+
 (defvar company-powershell-dir)
+
 (setq company-powershell-dir
       (when load-file-name (file-name-directory load-file-name)))
 
@@ -133,17 +140,13 @@
 
 (defun company-powershell--doc (candidate)
   (company-doc-buffer
-   (replace-regexp-in-string
-    "\n\n+" "\n\n"
-    (shell-command-to-string
-     (format "powershell -c \"Get-Help %s | %%{$_.Description}\""
-             candidate)))))
-
-;; (defun company-powershell--doc (candidate)
-;;   (let* ((syn (get-text-property 0 'synopsis candidate))
-;;          (syn (or (and (string= "" syn) "No documentation")
-;;                   (string-trim syn))))
-;;     (company-doc-buffer syn)))
+   (or (ht-get company-powershell--cache-doc-buffer candidate)
+       (let ((doc (replace-regexp-in-string
+                   "\n\n+" "\n\n"
+                   (shell-command-to-string
+                    (format "powershell -c Get-Help %s" candidate)))))
+         (ht-set company-powershell--cache-doc-buffer candidate doc)
+         doc))))
 
 (defun company-powershell--meta (candidate)
   (get-text-property 0 'synopsis candidate))
