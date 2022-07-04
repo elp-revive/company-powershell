@@ -6,8 +6,8 @@
 ;; Author: Noah Peart <noah.v.peart@gmail.com>
 ;; Maintainer: Jen-Chieh Shen <jcs090218@gmail.com>
 ;; URL: https://github.com/elp-revive/company-powershell
-;; Package-Requires: ((emacs "26.1") (company "0.8.12") (ht "2.4"))
 ;; Version: 0.0.1
+;; Package-Requires: ((emacs "26.1") (company "0.8.12") (ht "2.4"))
 ;; Keywords: convenience
 
 ;; This file is not part of GNU Emacs.
