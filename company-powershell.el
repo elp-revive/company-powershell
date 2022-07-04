@@ -1,12 +1,14 @@
-;;; company-powershell --- Emacs autocompletion backend for powershell
+;;; company-powershell --- Emacs autocompletion backend for powershell  -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2016 Noah Peart
+;; Copyright (C) 2022 Shen, Jen-Chieh
 
 ;; Author: Noah Peart <noah.v.peart@gmail.com>
 ;; Maintainer: Jen-Chieh Shen <jcs090218@gmail.com>
 ;; URL: https://github.com/elp-revive/company-powershell
 ;; Package-Requires: ((emacs "26.1") (company "0.8.12") (ht "2.4"))
-
-;; Copyright (C) 2016, Noah Peart, all rights reserved.
-;; Created: 23 September 2016
+;; Version: 0.0.1
+;; Keywords: convenience
 
 ;; This file is not part of GNU Emacs.
 ;;
