@@ -1,4 +1,4 @@
-;;; company-powershell --- Emacs autocompletion backend for powershell  -*- lexical-binding: t; -*-
+;;; company-powershell.el --- Emacs autocompletion backend for powershell  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2016 Noah Peart
 ;; Copyright (C) 2022 Shen, Jen-Chieh
