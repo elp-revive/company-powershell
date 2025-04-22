@@ -1,3 +1,5 @@
+;; -*- mode: eask; lexical-binding: t -*-
+
 (package "company-powershell"
          "0.0.1"
          "Emacs autocompletion backend for powershell")
